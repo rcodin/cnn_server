@@ -16,5 +16,5 @@ void free_mem(void *ptr);
 void print_conf_cfg(Conv_conf cfg, Data_conf input_cfg, Data_conf output_cfg);
 void replicate_across_rows(float *input, float *output, int rows, int cols);
 void replicate_across_cols(float *input, float *output, int rows, int cols);
-float get_highest_prob(float *data, int data_size);
+unsigned int get_highest_prob(float *data, int data_size);
 #endif

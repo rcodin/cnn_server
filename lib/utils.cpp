@@ -1,5 +1,7 @@
 #include <utils.hpp>
 #include <layers.hpp>
+#include <tiling.hpp>
+#include <mkl.h>
 
 void *alloc_1D(int i, size_t bytes) {
 	void *ret = (void *)calloc(i, bytes);
@@ -100,7 +102,7 @@ void replicate_across_rows(float *input, float *output, int rows, int cols) {
 	}
 }
 
-float get_highest_prob(float *data, int data_size) {
+unsigned int get_highest_prob(float *data, int data_size) {
 
 	unsigned int max_idx;
 	float max = -5.0f;
@@ -111,5 +113,49 @@ float get_highest_prob(float *data, int data_size) {
 		}
 		// std::cout<<data[i]<<std::endl;
 	}
-	return max_idx;
+	return (max_idx + 1);
+}
+
+//it load's part of the input in a tile
+
+void load_tile(float *in, Data_conf input_conf, TILE_IDX tile_idx, int num_tiles,
+	float *out, Data_conf output_conf, int tile_num) {
+
+	int h_base = tile_idx.h * output_conf.h;
+	int w_base = tile_idx.h * output_conf.w;
+
+	for (int h_idx = 0; h_idx < output_conf.h; h_idx++) {
+		for (int w_idx = 0; w_idx < output_conf.w; w_idx++) {
+			for (int c_idx = 0; c_idx < output_conf.c; c_idx++) {
+				int in_h_idx = h_base + h_idx;
+				int in_w_idx = w_base + w_idx;
+				out[(h_idx * output_conf.w + w_idx) * output_conf.c + c_idx] = 
+									in[(in_h_idx * input_conf.w + in_w_idx) * input_conf.c + c_idx];
+			}
+		}
+	}
+}
+
+//save the tile when we have merge them to creatw the full output
+void save_tile(float *in, Data_conf input_conf, TILE_IDX tile_idx,
+					float *out, Data_conf output_conf) {
+	int h_base = tile_idx.h * input_conf.h;
+	int w_base = tile_idx.w * input_conf.w;
+
+	for (int h_idx = 0; h_idx < input_conf.h; h_idx++) {
+		for (int w_idx = 0; w_idx < input_conf.w; w_idx++) {
+			for (int c_idx = 0; c_idx < input_conf.c; c_idx++) {
+				int out_h_idx = h_base + h_idx;
+				int out_w_idx = w_base + w_idx;
+
+				out[(out_h_idx * output_conf.w + out_w_idx) * output_conf.c + c_idx]
+						= in[(h_idx * input_conf.w + w_idx) * input_conf.c + c_idx];
+			}
+		}
+	}
+}
+
+void alloc_patch(float *patch, Data_conf input_conf, int num_tiles, Conv_conf conv_cfg) {
+	patch = (float *)mkl_calloc((input_conf.h/num_tiles) * (input_conf.w/num_tiles) * input_conf.c * 
+						conv_cfg.h * conv_cfg.w, sizeof(float), sizeof(float) *8);
 }

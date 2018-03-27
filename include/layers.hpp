@@ -25,12 +25,39 @@ struct Data_conf {
 	int c;
 };
 
-enum Layer_type {
+/*
+ **conv   = convolutional layer
+ **pool   = pooling layer
+ **relu   = Rectified linear unit
+ **fc 	  = fully connected or dense layer
+ **no_imp = not implemented in the library
+*/
+
+typedef enum Layer_type {
 	conv,
 	pool,
 	relu,
 	fc,
 	no_imp
+} ltype;
+
+/*
+ **type = type of the layer
+ **h = height
+ **w = weight
+ **c = channels
+ **s = stride
+ **p = pad
+ *** In case of fc layer the h represents the output size
+*/
+
+struct Layer_conf {
+	ltype type;
+	int h;
+	int w;
+	int c;
+	int s;
+	int p;
 };
 
 void conv_forward(float *in, float *out, float *filter, Conv_conf conv_conf, Data_conf input_conf, Data_conf output_conf);

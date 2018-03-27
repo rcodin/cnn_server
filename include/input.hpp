@@ -12,5 +12,6 @@ struct Image_cfg {
 	int rows;
 	int cols;
 };
+
 int read_image_rgb(std::string filename, Image_cfg cfg, float *data);
 #endif

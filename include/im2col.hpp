@@ -1,5 +1,6 @@
 #ifndef IM2COL_HPP
 #define IM2COL_HPP
+#include <tiling.hpp>
 
 void im2col_cpu(float* data_im,
         int channels, int height, int width,
