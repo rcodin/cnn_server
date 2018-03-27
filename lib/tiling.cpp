@@ -23,7 +23,24 @@ std::vector<std::vector<Data_conf>> create_tiled_conf(Data_conf input_conf, std:
 		}
 	}
 
-	
+	for (int h_idx = 0; h_idx < num_tiles; h_idx++) {
+		for (int w_idx = 0; w_idx < num_tiles; w_idx++) {
+
+			Data_conf curr_conf = output[output.size() - 1];
+			Data_conf curr_tiled_conf = {curr_conf.h/num_tiles, curr_conf.w/num_tiles, curr_conf.c};
+
+			std::vector<Data_conf> w_tile_conf;
+
+			for (std::vector<Layer_conf>::reverse_iterator rit = layers.rbegin();
+							rit != layers.rend(); rit++) {
+
+				w_tile_conf.insert(w_tile_conf.begin(), curr_tiled_conf);
+				Layer_conf curr_layer = *rit;
+
+				if (h_idx == 0 || h_idx == (num_tiles - 1) || w_idx == 0 || w_idx == (num_tiles))
+			}
+		}
+	}
 	// std::cout<<"sdfsd"<<std::endl;
 	return ret;
 }
