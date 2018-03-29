@@ -37,7 +37,28 @@ std::vector<std::vector<Data_conf>> create_tiled_conf(Data_conf input_conf, std:
 				w_tile_conf.insert(w_tile_conf.begin(), curr_tiled_conf);
 				Layer_conf curr_layer = *rit;
 
-				if (h_idx == 0 || h_idx == (num_tiles - 1) || w_idx == 0 || w_idx == (num_tiles))
+				int h_size = (curr_tiled_conf.h - 1)*curr_layer.s + curr_layer.h;
+				int w_size = (curr_tiled_conf.w - 1)*curr_layer.s + curr_layer.w;
+				int c_size = curr_tiled_conf.c;
+				curr_tiled_conf = {h_size, w_size, c_size};
+				
+				if(h_size == 0) {
+
+				}
+				else if (h_size == (num_tiles - 1)) {
+
+				}
+
+				if (w_size == 0) {
+
+				}
+				else if (w_size == (num_tiles - 1)) {
+
+				}
+				// else {
+					
+				// }
+				// if (h_idx == 0 || h_idx == (num_tiles - 1) || w_idx == 0 || w_idx == (num_tiles))
 			}
 		}
 	}
