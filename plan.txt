@@ -1,0 +1,6 @@
+The library has three levels.
+	i) first front end which parses the configuration and initiates the tiler module.
+	ii) the tiler module decides on tile size and runs the low level CNN kernels.
+	iii) The low level kernels which are basically normal CNN layer implementation.
+
+Test it on a raspberry pi.

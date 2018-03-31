@@ -60,6 +60,15 @@ struct Layer_conf {
 	int p;
 };
 
+
+struct TILE_Conf {
+	int h_s;
+	int h_e;
+	int w_s;
+	int w_e;
+	int c;
+};
+
 void conv_forward(float *in, float *out, float *filter, Conv_conf conv_conf, Data_conf input_conf, Data_conf output_conf);
 void conv_im2col(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
 					Data_conf input_conf, Data_conf output_conf);
