@@ -12,3 +12,5 @@ test_2layer_224:
 	icpc $(INCLUDE_PATH) $(CFLAGS) test_2layer_224.cpp -o test_2layer_224.exec $(INTEL_FLAGS) $(FLAGS) $(OPENCV_FLAGS)
 tiling_test:
 	icpc $(INCLUDE_PATH) $(CFLAGS) tiling_test.cpp -o tiling_test.exec $(INTEL_FLAGS) $(FLAGS)
+try_tiled:
+	icpc -I../include $(CFLAGS) try_tiled.cpp -o try_tiled.exec $(INTEL_FLAGS) $(FLAGS) $(OPENCV_FLAGS)

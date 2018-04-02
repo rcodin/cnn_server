@@ -24,6 +24,8 @@ void im2col_cpu(float* data_im,
     int height_col = (height + 2*pad - ksize) / stride + 1;
     int width_col = (width + 2*pad - ksize) / stride + 1;
 
+    // std::cout<<height_col<<std::endl;
+
     int channels_col = channels * ksize * ksize;
     for (c = 0; c < channels_col; ++c) {
         int w_offset = (c / channels) % ksize;

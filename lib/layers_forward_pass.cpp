@@ -53,7 +53,7 @@ void conv_im2col(float *in, float *out, float *weights, float *biases, Conv_conf
 	CBLAS_TRANSPOSE transa = CblasNoTrans;
 	CBLAS_TRANSPOSE transb = CblasNoTrans;
 	MKL_INT m = output_conf.c;
-	MKL_INT n = input_conf.h * input_conf.w;
+	MKL_INT n = output_conf.h * output_conf.w;
 	MKL_INT k = input_conf.c * conv_conf.h * conv_conf.w;
 	float alpha = 1;
 	const float *a = weights;
@@ -147,7 +147,7 @@ void conv_im2row(float *in, float *out, float *weights, float *biases, Conv_conf
 	int ksize = conv_conf.h;
 	int stride = conv_conf.stride;
 
-	float *patch_mat = (float *)mkl_calloc(input_conf.h * input_conf.w * input_conf.c * 
+	float *patch_mat = (float *)mkl_calloc(output_conf.h * output_conf.w * output_conf.c * 
 		conv_conf.h * conv_conf.w,  sizeof(float), 32);
 	
 	im2col_cpu(in, channels, height, width, ksize, stride, pad, patch_mat);
@@ -156,7 +156,7 @@ void conv_im2row(float *in, float *out, float *weights, float *biases, Conv_conf
 	CBLAS_LAYOUT layout = CblasRowMajor;
 	CBLAS_TRANSPOSE transa = CblasTrans;
 	CBLAS_TRANSPOSE transb = CblasNoTrans;
-	MKL_INT m = input_conf.h * input_conf.w;
+	MKL_INT m = output_conf.h * output_conf.w;
 	MKL_INT n = output_conf.c;
 	MKL_INT k = input_conf.c * conv_conf.h * conv_conf.w;
 	float alpha = 1;
