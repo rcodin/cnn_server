@@ -81,6 +81,9 @@ void fc_softmax_forward(float *in, float *out, float *weights, float *biases, in
 void softmax_forward(float *in, float *out, int input_size, int output_size);
 float *patch_ret(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
 					Data_conf input_conf, Data_conf output_conf);
+
+void conv_forward_bias(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
+									Data_conf input_conf, Data_conf output_conf);
 // using namespace std;
 using namespace std::chrono;
 

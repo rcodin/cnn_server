@@ -33,6 +33,44 @@ void conv_forward(float *in, float *out, float *filter, Conv_conf conv_conf,
 	}
 }
 
+void conv_forward_bias(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
+									Data_conf input_conf, Data_conf output_conf) {	
+	int in_h = input_conf.h;
+	int in_w = input_conf.w;
+	int in_c = input_conf.c;
+
+	int out_h = output_conf.h;
+	int out_w = output_conf.w;
+	int out_c = output_conf.c;
+
+
+	for (int h_idx = 0; h_idx < out_h; h_idx++) {
+		for (int w_idx = 0; w_idx < out_w; w_idx++) {
+			for (int c_idx = 0; c_idx < out_c; c_idx++) {
+
+				float elem = 0.0f;
+				for (int i = 0; i < conv_conf.h; i++) {
+					for (int j = 0; j < conv_conf.w; j++) {
+						for (int k = 0; k < in_c; k++) {
+							int in_h_idx = h_idx + i - conv_conf.h/2;
+							int in_w_idx = w_idx + j - conv_conf.w/2;
+							if (in_h_idx >= 0 && in_h_idx < in_h && in_w_idx >= 0 && in_w_idx < in_w) {
+								elem += in[(in_h_idx * in_w + in_w_idx) * in_c + k] * 
+									weights[((i * conv_conf.w + j) * in_c + k) * out_c + c_idx];
+							}
+							else {
+								// std::cout<<in_h_idx<<" "<<in_w_idx<<std::endl;
+							}
+						}
+					}
+				}
+				out[(h_idx * out_w + w_idx) * out_c + c_idx] = std::fmax(elem + biases[c_idx], 0);
+			}
+		}
+	}
+	// replicate_across_cols(biases, out, output_conf.c, output_conf.h * output_conf.w);
+}
+
 void conv_im2col(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
 					Data_conf input_conf, Data_conf output_conf) {
 	int pad = conv_conf.pad;

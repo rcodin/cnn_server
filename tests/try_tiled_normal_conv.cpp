@@ -23,8 +23,8 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
-	int h_num_tiles = 56;
-	int w_num_tiles = 56;
+	int h_num_tiles = 28;
+	int w_num_tiles = 28;
 
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 	Data_conf input11_tiled_conf = {input11_conf.h/h_num_tiles + (conv11_conf.h - 1),
@@ -37,11 +37,11 @@ int main() {
 	float *output11 = (float *)mkl_calloc(output11_conf.h * output11_conf.w *
 		output11_conf.c, bytes, alignment);
 
-	float *input11_tiled;// = (float *)mkl_calloc(input11_tiled_conf.h * input11_tiled_conf.w *
-		// input11_tiled_conf.c, bytes, alignment);
+	float *input11_tiled = (float *)mkl_calloc(input11_tiled_conf.h * input11_tiled_conf.w *
+		input11_tiled_conf.c, bytes, alignment);
 
-	float *output11_tiled;// = (float *)mkl_calloc(output11_tiled_conf.h * output11_tiled_conf.w *
-		// output11_tiled_conf.c, bytes, alignment);
+	float *output11_tiled = (float *)mkl_calloc(output11_tiled_conf.h * output11_tiled_conf.w *
+		output11_tiled_conf.c, bytes, alignment);
 
     std::string weight_dir = "/home/roni/project/files/vgg_16/tensorflow/weights_dir/";
     std::string image_file = "/home/roni/project/files/vgg_16/tensorflow/laska.png";
@@ -105,7 +105,7 @@ int main() {
 			    	}
 			    }
 
-				conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
+				conv_forward_bias(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
 					input11_tiled_conf, output11_tiled_conf);
 
 
@@ -126,7 +126,7 @@ int main() {
 
 	}
 	else {
-		conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
+		conv_forward_bias(input11, output11, conv11_weights, conv11_biases, conv11_conf,
 				input11_conf, output11_conf);
 	}
 

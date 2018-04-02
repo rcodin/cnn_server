@@ -79,8 +79,8 @@ int main() {
 		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
 			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
-				int h_base = h_tile * (input11_tiled_conf.h - 2);
-				int w_base = w_tile * (input11_tiled_conf.w - 2);
+				int h_base = h_tile * (input11_tiled_conf.h - (conv11_conf.h - 1));
+				int w_base = w_tile * (input11_tiled_conf.w - (conv11_conf.w - 1));
 
 				// cout<<h_base<<" "<<w_base<<endl;
 				for (int out_h_idx = 0; out_h_idx < input11_tiled_conf.h; out_h_idx++) {

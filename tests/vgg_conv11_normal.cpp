@@ -23,8 +23,8 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
-	int h_num_tiles = 56;
-	int w_num_tiles = 56;
+	int h_num_tiles = 28;
+	int w_num_tiles = 28;
 
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 	Data_conf input11_tiled_conf = {input11_conf.h/h_num_tiles + (conv11_conf.h - 1),
@@ -37,11 +37,11 @@ int main() {
 	float *output11 = (float *)mkl_calloc(output11_conf.h * output11_conf.w *
 		output11_conf.c, bytes, alignment);
 
-	float *input11_tiled;// = (float *)mkl_calloc(input11_tiled_conf.h * input11_tiled_conf.w *
-		// input11_tiled_conf.c, bytes, alignment);
+	float *input11_tiled = (float *)mkl_calloc(input11_tiled_conf.h * input11_tiled_conf.w *
+		input11_tiled_conf.c, bytes, alignment);
 
-	float *output11_tiled;// = (float *)mkl_calloc(output11_tiled_conf.h * output11_tiled_conf.w *
-		// output11_tiled_conf.c, bytes, alignment);
+	float *output11_tiled = (float *)mkl_calloc(output11_tiled_conf.h * output11_tiled_conf.w *
+		output11_tiled_conf.c, bytes, alignment);
 
     std::string weight_dir = "/home/roni/project/files/vgg_16/tensorflow/weights_dir/";
     std::string image_file = "/home/roni/project/files/vgg_16/tensorflow/laska.png";
@@ -79,9 +79,9 @@ int main() {
 		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
 			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
-				int h_base = h_tile * (input11_tiled_conf.h - 2);
-				int w_base = w_tile * (input11_tiled_conf.w - 2);
-
+				int h_base = h_tile * (input11_tiled_conf.h - (conv11_conf.h - 1));
+				int w_base = w_tile * (input11_tiled_conf.w - (conv11_conf.w - 1));
+				
 				// cout<<h_base<<" "<<w_base<<endl;
 				for (int out_h_idx = 0; out_h_idx < input11_tiled_conf.h; out_h_idx++) {
 			    	for (int out_w_idx = 0; out_w_idx < input11_tiled_conf.w; out_w_idx++) {
@@ -105,7 +105,7 @@ int main() {
 			    	}
 			    }
 
-				conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
+				conv_forward_bias(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
 					input11_tiled_conf, output11_tiled_conf);
 
 
@@ -126,7 +126,7 @@ int main() {
 
 	}
 	else {
-		conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
+		conv_forward_bias(input11, output11, conv11_weights, conv11_biases, conv11_conf,
 				input11_conf, output11_conf);
 	}
 

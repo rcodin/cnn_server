@@ -11,6 +11,11 @@ struct TILE_IDX {
 	int w;
 };
 
+struct TILE_BASE {
+	int h;
+	int w;
+};
+
 struct PAD_CONF {
 	int h_s;
 	int h_e;
