@@ -23,8 +23,8 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
-	int h_num_tiles = 8;
-	int w_num_tiles = 8;
+	int h_num_tiles = 28;
+	int w_num_tiles = 28;
 
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 	Data_conf input11_tiled_conf = {input11_conf.h/h_num_tiles + (conv11_conf.h - 1),
@@ -105,25 +105,6 @@ int main() {
 			    	}
 			    }
 
-			    float *ret = patch_ret(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
-					input11_tiled_conf, output11_tiled_conf);
-
-			    // int size = conv11_conf.h * conv11_conf.w * conv11_conf.c * output_conf.h;
-				// for (int i = 0; i < 16; i++)
-				if (h_tile == 0 && w_tile == 1)
-				{
-					for (int i = 0; i < (conv11_conf.h * conv11_conf.w * input11_conf.c); i++) {
-						cout<<ret[i * (output11_tiled_conf.h * output11_tiled_conf.w) + 2]<<endl;
-					}
-					// for (int i = 0; i < 3; i++) {
-					// 	for (int j = 0; j < 3; j++) {
-					// 		for (int k = 0; k < 3; k++) {
-
-					// 		}
-					// 	}
-					// }
-				}
-
 				conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
 					input11_tiled_conf, output11_tiled_conf);
 
@@ -136,6 +117,7 @@ int main() {
 			    			int out_idx = ((h_idx + h_base) * output11_conf.w + (w_idx + w_base)) * output11_conf.c + c_idx;
 
 			    			output11[out_idx] = output11_tiled[in_idx];
+			    			output11_tiled[in_idx] = 0;
 			    		}
 			    	}
 			    }
@@ -146,25 +128,18 @@ int main() {
 	else {
 		conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
 				input11_conf, output11_conf);
-		// cout<<"not tiled"<<endl;
 	}
-
-	 float *ret1 = patch_ret(input11, output11, conv11_weights, conv11_biases, conv11_conf,
-					input11_conf, output11_conf);
-
-	for (int i = 0; i < (conv11_conf.h * conv11_conf.w * input11_conf.c); i++) {
-		cout<<ret1[(i) * (output11_conf.h * output11_conf.w) + 30]<<endl;
-	}
-	// for (int i = 0; i < output11_conf.h; i++) {
-	// 	for (int j = 0; j < output11_conf.h; j++) {
-	// 		for (int k = 0; k < output11_conf.c; k++) {
-	// 			int idx = (i * output11_conf.w + j) * output11_conf.c + k;
-	// 			cout<<fixed<<setprecision(10)<<output11[idx]<<endl;
-	// 		}
-	// 	}
-	// }
 
 	auto end = std::chrono::system_clock::now();
+
+	for (int i = 0; i < output11_conf.h; i++) {
+		for (int j = 0; j < output11_conf.h; j++) {
+			for (int k = 0; k < output11_conf.c; k++) {
+				int idx = (i * output11_conf.w + j) * output11_conf.c + k;
+				cout<<fixed<<setprecision(10)<<output11[idx]<<endl;
+			}
+		}
+	}
 
 	std::chrono::duration<double> elapsed_time = end-start;
 

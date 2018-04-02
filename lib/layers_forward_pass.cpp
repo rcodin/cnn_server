@@ -152,7 +152,7 @@ void conv_im2row(float *in, float *out, float *weights, float *biases, Conv_conf
 	
 	im2col_cpu(in, channels, height, width, ksize, stride, pad, patch_mat);
 	
-
+	replicate_across_rows(biases, out, output_conf.h * output_conf.w, output_conf.c);
 	CBLAS_LAYOUT layout = CblasRowMajor;
 	CBLAS_TRANSPOSE transa = CblasTrans;
 	CBLAS_TRANSPOSE transb = CblasNoTrans;
@@ -169,7 +169,6 @@ void conv_im2row(float *in, float *out, float *weights, float *biases, Conv_conf
 	MKL_INT ldc = n;
 	cblas_sgemm(layout, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
 
-	replicate_across_rows(biases, out, output_conf.h * output_conf.w, output_conf.c);
 	// relu
 	for (int i = 0; i < output_conf.h; i++) {
 		for (int j = 0; j < output_conf.w; j++) {
