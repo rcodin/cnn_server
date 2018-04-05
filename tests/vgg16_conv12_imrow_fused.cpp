@@ -121,7 +121,7 @@ int main() {
 
 				TILE_BASE tile_base = {h_base, w_base};
 
-				load_tile(input11, input11_conf, tile_base, h_num_tiles, 
+				load_tile(input11, input11_conf, tile_base, h_num_tiles,
 							input11_tiled, input11_tiled_conf);
 
 				conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
@@ -131,7 +131,7 @@ int main() {
 
 			}
 		}
-		start = std::chrono::system_clock::now();
+		// start = std::chrono::system_clock::now();
 		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
 			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
@@ -150,7 +150,7 @@ int main() {
 
 			}
 		}
-		end = std::chrono::system_clock::now();
+		// end = std::chrono::system_clock::now();
 	}
 	else {
 		conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
@@ -167,12 +167,4 @@ int main() {
 
 	cout<<elapsed_time.count()<<endl;
 
-	// for (int i = 0; i < output12_conf.h; i++) {
-	// 	for (int j = 0; j < output12_conf.h; j++) {
-	// 		for (int k = 0; k < output12_conf.c; k++) {
-	// 			int idx = (i * output12_conf.w + j) * output12_conf.c + k;
-	// 			cout<<fixed<<setprecision(10)<<output12[idx]<<endl;
-	// 		}
-	// 	}
-	// }
 }

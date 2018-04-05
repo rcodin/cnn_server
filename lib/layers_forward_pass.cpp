@@ -219,6 +219,49 @@ void conv_im2row(float *in, float *out, float *weights, float *biases, Conv_conf
 	mkl_free(patch_mat);
 }
 
+void conv_im2row_mod(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
+					Data_conf input_conf, Data_conf output_conf) {
+	int pad = conv_conf.pad;
+	int channels = input_conf.c;
+	int height = input_conf.h;
+	int width = input_conf.w;
+	int ksize = conv_conf.h;
+	int stride = conv_conf.stride;
+
+	float *patch_mat = (float *)mkl_calloc(output_conf.h * output_conf.w * output_conf.c * 
+		conv_conf.h * conv_conf.w,  sizeof(float), 32);
+	
+	im2col_cpu_mod(in, channels, height, width, ksize, stride, pad, patch_mat);
+	
+	replicate_across_rows(biases, out, output_conf.h * output_conf.w, output_conf.c);
+	CBLAS_LAYOUT layout = CblasRowMajor;
+	CBLAS_TRANSPOSE transa = CblasNoTrans;
+	CBLAS_TRANSPOSE transb = CblasNoTrans;
+	MKL_INT m = output_conf.h * output_conf.w;
+	MKL_INT n = output_conf.c;
+	MKL_INT k = input_conf.c * conv_conf.h * conv_conf.w;
+	float alpha = 1;
+	const float *a = patch_mat;
+	MKL_INT lda = k;
+	float *b = weights;
+	MKL_INT ldb = n;
+	float beta = 1;
+	float *c = out;
+	MKL_INT ldc = n;
+	cblas_sgemm(layout, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
+
+	// relu
+	for (int i = 0; i < output_conf.h; i++) {
+		for (int j = 0; j < output_conf.w; j++) {
+			for (int k = 0; k < output_conf.c; k++) {
+				int idx = (i * output_conf.w + j) * output_conf.c + k;
+				out[idx] = std::fmax(out[idx], 0);
+			}
+		}
+	}
+	mkl_free(patch_mat);
+}
+
 void pool_forward(float *in, float *out, Data_conf input_conf, Data_conf output_conf, Pool_conf pool_conf) {
 	for (int h_idx = 0; h_idx < output_conf.h; h_idx++) {
 		for (int w_idx = 0; w_idx < output_conf.w; w_idx++) {

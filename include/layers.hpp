@@ -74,6 +74,9 @@ void conv_im2col(float *in, float *out, float *weights, float *biases, Conv_conf
 					Data_conf input_conf, Data_conf output_conf);
 void conv_im2row(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
 					Data_conf input_conf, Data_conf output_conf);
+void conv_im2row_mod(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
+					Data_conf input_conf, Data_conf output_conf);
+
 void pool_forward(float *in, float *out, Data_conf input_conf, Data_conf output_conf, Pool_conf pool_conf);
 void relu_forward(float *in, float *out, Data_conf input_conf);
 void fc_forward(float *in, float *out, float *weights, float *biases, int input_size, int output_size);

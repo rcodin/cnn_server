@@ -20,3 +20,19 @@ try_tiled_normal_conv:
 	icpc $(INCLUDE_PATH) $(CFLAGS) try_tiled_normal_conv.cpp -o try_tiled_normal_conv.exec $(INTEL_FLAGS) $(FLAGS)
 vgg16_conv12_im2row:
 	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv12_im2row.cpp -o vgg16_conv12_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv21_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv21_im2row.cpp -o vgg16_conv21_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv22_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv22_im2row.cpp -o vgg16_conv22_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv31_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv31_im2row.cpp -o vgg16_conv31_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv41_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv41_im2row.cpp -o vgg16_conv41_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv42_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv42_im2row.cpp -o vgg16_conv42_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+
+vgg16_conv43_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv43_im2row.cpp -o vgg16_conv43_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+
+vgg16_conv51_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv51_im2row.cpp -o vgg16_conv51_im2row.exec $(INTEL_FLAGS) $(FLAGS)
