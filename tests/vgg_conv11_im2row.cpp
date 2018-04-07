@@ -132,18 +132,18 @@ int main() {
 
 	auto end = std::chrono::system_clock::now();
 
-	// for (int i = 0; i < output11_conf.h; i++) {
-	// 	for (int j = 0; j < output11_conf.h; j++) {
-	// 		for (int k = 0; k < output11_conf.c; k++) {
-	// 			int idx = (i * output11_conf.w + j) * output11_conf.c + k;
-	// 			cout<<fixed<<setprecision(10)<<output11[idx]<<endl;
-	// 		}
-	// 	}
-	// }
+	for (int i = 0; i < output11_conf.h; i++) {
+		for (int j = 0; j < output11_conf.h; j++) {
+			for (int k = 0; k < output11_conf.c; k++) {
+				int idx = (i * output11_conf.w + j) * output11_conf.c + k;
+				cout<<fixed<<setprecision(10)<<output11[idx]<<endl;
+			}
+		}
+	}
 
 	std::chrono::duration<double> elapsed_time = end-start;
 
-	cout<<elapsed_time.count()<<endl;
+	// cout<<elapsed_time.count()<<endl;
 
 	// auto start1 = std::chrono::system_clock::now();
 
