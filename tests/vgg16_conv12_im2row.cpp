@@ -26,8 +26,8 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
-	int h_num_tiles = 8;
-	int w_num_tiles = 8;
+	int h_num_tiles = 2;
+	int w_num_tiles = 2;
 
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 

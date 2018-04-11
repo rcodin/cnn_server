@@ -114,7 +114,7 @@ void conv_im2col(float *in, float *out, float *weights, float *biases, Conv_conf
 	}
 }
 
-float *patch_ret(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
+void patch_ret(float *in, float *out, float *weights, float *biases, Conv_conf conv_conf,
 					Data_conf input_conf, Data_conf output_conf) {
 	int pad = conv_conf.pad;
 	int channels = input_conf.c;
@@ -128,8 +128,7 @@ float *patch_ret(float *in, float *out, float *weights, float *biases, Conv_conf
 	
 	im2col_cpu(in, channels, height, width, ksize, stride, pad, patch_mat);
 	
-	return patch_mat;
-	// replicate_across_rows(biases, out, output_conf.h * output_conf.w, output_conf.c);
+	mkl_free(patch_mat);
 }
 
 void conv_im2row_patch(float *patch_mat, float *out, float *weights, float *biases, Conv_conf conv_conf,

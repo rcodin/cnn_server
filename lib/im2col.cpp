@@ -20,20 +20,22 @@ void im2col_cpu(float* data_im,
      int channels,  int height,  int width,
      int ksize,  int stride, int pad, float* data_col) 
 {
-    int c,h,w;
+    // int c,h,w;
     int height_col = (height + 2*pad - ksize) / stride + 1;
     int width_col = (width + 2*pad - ksize) / stride + 1;
 
     // std::cout<<height_col<<std::endl;
 
     int channels_col = channels * ksize * ksize;
-    for (c = 0; c < channels_col; ++c) {
+
+    // #pragma omp parallel for
+    for (int c = 0; c < channels_col; ++c) {
         int w_offset = (c / channels) % ksize;
         int h_offset = c / ksize / channels;
         int c_im = c % channels;
         
-        for (h = 0; h < height_col; ++h) {
-            for (w = 0; w < width_col; ++w) {
+        for (int h = 0; h < height_col; ++h) {
+            for (int w = 0; w < width_col; ++w) {
                 int im_row = h_offset + h * stride;
                 int im_col = w_offset + w * stride;
                 int col_index = (c * height_col + h) * width_col + w;
