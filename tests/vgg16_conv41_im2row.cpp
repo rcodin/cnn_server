@@ -40,9 +40,12 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
+	bool tiled = true;
+
 	int h_num_tiles = 14;
 	int w_num_tiles = 14;
 
+	int times = 100;
 
 
 		Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
@@ -326,9 +329,6 @@ int main() {
 	    cnpy::NpyArray arr41_biases = cnpy::npy_load(weight_dir+"conv4_1_b.npy");
 		conv41_biases = arr41_biases.data<float>();
 
-	int times = 10;
-
-	bool tiled = true;
 
 	double tot_time = 0.0;
 
@@ -542,18 +542,18 @@ int main() {
 		// cout<<tot_time/times<<endl;
 	}
 
-	cout<<tot_time/times<<endl;
+	// cout<<tot_time/times<<endl;
 
 	// std::chrono::duration<double> elapsed_time = end-start;
 
 	// cout<<elapsed_time.count()<<endl;
 
-	// for (int i = 0; i < output41_conf.h ; i++) {
-	// 	for (int j = 0; j < output41_conf.w; j++) {
-	// 		for (int k = 0; k < output41_conf.c; k++) {
-	// 			int idx = (i * output41_conf.w + j) * output41_conf.c + k;
-	// 			cout<<fixed<<setprecision(10)<<output41[idx]<<endl;
-	// 		}
-	// 	}
-	// }
+	for (int i = 0; i < output41_conf.h ; i++) {
+		for (int j = 0; j < output41_conf.w; j++) {
+			for (int k = 0; k < output41_conf.c; k++) {
+				int idx = (i * output41_conf.w + j) * output41_conf.c + k;
+				cout<<fixed<<setprecision(10)<<output41[idx]<<endl;
+			}
+		}
+	}
 }

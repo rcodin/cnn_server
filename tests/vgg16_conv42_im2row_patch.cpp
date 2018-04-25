@@ -39,11 +39,14 @@ int main() {
 
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
-
-	int h_num_tiles = 28;
-	int w_num_tiles = 28;
-
+	
+	int times = 100;
 	bool tiled = true;
+	
+	int h_num_tiles = 14;
+	int w_num_tiles = 14;
+
+
 
 		Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 
@@ -199,6 +202,63 @@ int main() {
 		float *output33_tiled = (float *)mkl_calloc(output33_tiled_conf.h * output33_tiled_conf.w *
 			output33_tiled_conf.c, bytes, alignment);
 
+		//Pool3
+		Pool_conf pool3_conf = {2, 2};
+		Data_conf input34_conf = {56, 56, 256};
+		Data_conf output34_conf = {28, 28, 256};
+
+		float *input34 = output33;
+		float *output34 = (float *)mkl_calloc(output34_conf.h * output34_conf.w *
+			output34_conf.c, bytes, alignment);
+
+
+		//Conv41
+		Conv_conf conv41_conf = {3, 3, 1, 1};
+		Data_conf input41_conf = {28, 28, 256};
+		Data_conf output41_conf = {28, 28, 512};
+
+
+		Conv_conf conv41_tiled_conf = {3, 3, 1, 0};
+		Data_conf input41_tiled_conf = {input41_conf.h/h_num_tiles + (conv41_conf.h - 1),
+						input41_conf.w/w_num_tiles  + (conv41_conf.w - 1), input41_conf.c};
+		Data_conf output41_tiled_conf = {output41_conf.h/h_num_tiles, output41_conf.w/w_num_tiles, output41_conf.c};
+
+
+		float *input41 = output34;
+
+		float *output41 = (float *)mkl_calloc(output41_conf.h * output41_conf.w *
+			output41_conf.c, bytes, alignment);
+
+		float *input41_tiled = (float *)mkl_calloc(input41_tiled_conf.h * input41_tiled_conf.w *
+			input41_tiled_conf.c, bytes, alignment);
+
+		float *output41_tiled = (float *)mkl_calloc(output41_tiled_conf.h * output41_tiled_conf.w *
+			output41_tiled_conf.c, bytes, alignment);
+
+
+		//Conv42
+		Conv_conf conv42_conf = {3, 3, 1, 1};
+		Data_conf input42_conf = {28, 28, 512};
+		Data_conf output42_conf = {28, 28, 512};
+
+
+		Conv_conf conv42_tiled_conf = {3, 3, 1, 0};
+		Data_conf input42_tiled_conf = {input42_conf.h/h_num_tiles + (conv42_conf.h - 1),
+						input42_conf.w/w_num_tiles  + (conv42_conf.w - 1), input42_conf.c};
+		Data_conf output42_tiled_conf = {output42_conf.h/h_num_tiles, output42_conf.w/w_num_tiles, output42_conf.c};
+
+
+		float *input42 = output41;
+
+		float *output42 = (float *)mkl_calloc(output42_conf.h * output42_conf.w *
+			output42_conf.c, bytes, alignment);
+
+		float *input42_tiled = (float *)mkl_calloc(input42_tiled_conf.h * input42_tiled_conf.w *
+			input42_tiled_conf.c, bytes, alignment);
+
+		float *output42_tiled = (float *)mkl_calloc(output42_tiled_conf.h * output42_tiled_conf.w *
+			output42_tiled_conf.c, bytes, alignment);
+
 
 	    std::string weight_dir = "/home/roni/project/files/vgg_16/tensorflow/weights_dir/";
 	    std::string image_file = "/home/roni/project/files/vgg_16/tensorflow/laska.png";
@@ -234,13 +294,18 @@ int main() {
 		float *conv31_weights;
 		float *conv31_biases;
 
-
 		float *conv32_weights;
 		float *conv32_biases;
 
 		float *conv33_weights;
 		float *conv33_biases;
+
+		float *conv41_weights;
+		float *conv41_biases;
 		
+		float *conv42_weights;
+		float *conv42_biases;
+
 		cnpy::NpyArray arr11 = cnpy::npy_load(weight_dir+"conv1_1_W.npy");
 		conv11_weights = arr11.data<float>();
 
@@ -285,7 +350,19 @@ int main() {
 	    cnpy::NpyArray arr33_biases = cnpy::npy_load(weight_dir+"conv3_3_b.npy");
 		conv33_biases = arr33_biases.data<float>();
 
-	int times = 100;
+		cnpy::NpyArray arr41 = cnpy::npy_load(weight_dir+"conv4_1_W.npy");
+		conv41_weights = arr41.data<float>();
+
+	    cnpy::NpyArray arr41_biases = cnpy::npy_load(weight_dir+"conv4_1_b.npy");
+		conv41_biases = arr41_biases.data<float>();
+
+		cnpy::NpyArray arr42 = cnpy::npy_load(weight_dir+"conv4_2_W.npy");
+		conv42_weights = arr42.data<float>();
+
+	    cnpy::NpyArray arr42_biases = cnpy::npy_load(weight_dir+"conv4_2_b.npy");
+		conv42_biases = arr42_biases.data<float>();
+
+
 
 	double tot_time = 0.0;
 
@@ -372,30 +449,105 @@ int main() {
 		pool_forward(input23, output23, input23_conf, output23_conf, pool2_conf);
 		
 
+		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
+
+				int h_base = h_tile * (input31_tiled_conf.h - (conv31_conf.h - 1));
+				int w_base = w_tile * (input31_tiled_conf.w - (conv31_conf.w - 1));
+
+				TILE_BASE tile_base = {h_base, w_base};
+
+				load_tile(input31, input31_conf, tile_base, h_num_tiles, 
+							input31_tiled, input31_tiled_conf);
+
+				conv_im2row(input31_tiled, output31_tiled, conv31_weights, conv31_biases, conv31_tiled_conf,
+					input31_tiled_conf, output31_tiled_conf);
+
+				save_tile(output31_tiled, output31_tiled_conf, tile_base, output31, output31_conf);
+
+			}
+		}
 
 
+		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
+
+				int h_base = h_tile * (input32_tiled_conf.h - (conv32_conf.h - 1));
+				int w_base = w_tile * (input32_tiled_conf.w - (conv32_conf.w - 1));
+
+				TILE_BASE tile_base = {h_base, w_base};
+
+				load_tile(input32, input32_conf, tile_base, h_num_tiles, 
+							input32_tiled, input32_tiled_conf);
+
+				conv_im2row(input32_tiled, output32_tiled, conv32_weights, conv32_biases, conv32_tiled_conf,
+					input32_tiled_conf, output32_tiled_conf);
+
+				save_tile(output32_tiled, output32_tiled_conf, tile_base, output32, output32_conf);
+
+			}
+		}
+
+		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
+
+				int h_base = h_tile * (input33_tiled_conf.h - (conv33_conf.h - 1));
+				int w_base = w_tile * (input33_tiled_conf.w - (conv33_conf.w - 1));
+
+				TILE_BASE tile_base = {h_base, w_base};
+
+				load_tile(input33, input33_conf, tile_base, h_num_tiles, 
+							input33_tiled, input33_tiled_conf);
+
+				conv_im2row(input33_tiled, output33_tiled, conv33_weights, conv33_biases, conv33_tiled_conf,
+					input33_tiled_conf, output33_tiled_conf);
+
+				save_tile(output33_tiled, output33_tiled_conf, tile_base, output33, output33_conf);
+
+			}
+		}
+
+		pool_forward(input34, output34, input34_conf, output34_conf, pool2_conf);
+
+		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
+
+				int h_base = h_tile * (input41_tiled_conf.h - (conv41_conf.h - 1));
+				int w_base = w_tile * (input41_tiled_conf.w - (conv41_conf.w - 1));
+
+				TILE_BASE tile_base = {h_base, w_base};
+
+				load_tile(input41, input41_conf, tile_base, h_num_tiles, 
+							input41_tiled, input41_tiled_conf);
+
+				conv_im2row(input41_tiled, output41_tiled, conv41_weights, conv41_biases, conv41_tiled_conf,
+					input41_tiled_conf, output41_tiled_conf);
+
+				save_tile(output41_tiled, output41_tiled_conf, tile_base, output41, output41_conf);
+
+			}
+		}
 		for (int i = 0; i < times; i++) {
 			start = std::chrono::system_clock::now();
 			
 			for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
 				for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
-					int h_base = h_tile * (input31_tiled_conf.h - (conv31_conf.h - 1));
-					int w_base = w_tile * (input31_tiled_conf.w - (conv31_conf.w - 1));
+					int h_base = h_tile * (input42_tiled_conf.h - (conv42_conf.h - 1));
+					int w_base = w_tile * (input42_tiled_conf.w - (conv42_conf.w - 1));
 
 					TILE_BASE tile_base = {h_base, w_base};
 
-					load_tile(input31, input31_conf, tile_base, h_num_tiles, 
-								input31_tiled, input31_tiled_conf);
+					load_tile(input42, input42_conf, tile_base, h_num_tiles, 
+								input42_tiled, input42_tiled_conf);
 
-					conv_im2row(input31_tiled, output31_tiled, conv31_weights, conv31_biases, conv31_tiled_conf,
-						input31_tiled_conf, output31_tiled_conf);
+					patch_ret(input42_tiled, output42_tiled, conv42_weights, conv42_biases, conv42_tiled_conf,
+						input42_tiled_conf, output42_tiled_conf);
 
-					save_tile(output31_tiled, output31_tiled_conf, tile_base, output31, output31_conf);
+					save_tile(output42_tiled, output42_tiled_conf, tile_base, output42, output42_conf);
 
 				}
 			}
-
 			end = std::chrono::system_clock::now();
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();
@@ -419,15 +571,23 @@ int main() {
 		
 		pool_forward(input23, output23, input23_conf, output23_conf, pool2_conf);
 
+		conv_im2row(input31, output31, conv31_weights,conv31_biases, conv31_conf, input31_conf, output31_conf);
 		
+		conv_im2row(input32, output32, conv32_weights,conv32_biases, conv32_conf, input32_conf, output32_conf);
+
+		conv_im2row(input33, output33, conv33_weights,conv33_biases, conv33_conf, input33_conf, output33_conf);
+
+		pool_forward(input34, output34, input34_conf, output34_conf, pool2_conf);
+
+		conv_im2row(input41, output41, conv41_weights,conv41_biases, conv41_conf, input41_conf, output41_conf);
 		
 		for (int i = 0; i < times; i++) {
 			
-			for (int idx = 0; idx < output31_conf.h * output31_conf.w * output31_conf.c; idx++) {
-				output31[idx] = 0.0f;
+			for (int idx = 0; idx < output42_conf.h * output42_conf.w * output42_conf.c; idx++) {
+				output42[idx] = 0.0f;
 			}
 			start = std::chrono::system_clock::now();
-			conv_im2row(input31, output31, conv31_weights,conv31_biases, conv31_conf, input31_conf, output31_conf);
+			patch_ret(input42, output42, conv42_weights,conv42_biases, conv42_conf, input42_conf, output42_conf);
 			end = std::chrono::system_clock::now();
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();
@@ -442,11 +602,11 @@ int main() {
 
 	// cout<<elapsed_time.count()<<endl;
 
-	// for (int i = 0; i < output31_conf.h ; i++) {
-	// 	for (int j = 0; j < output31_conf.w; j++) {
-	// 		for (int k = 0; k < output31_conf.c; k++) {
-	// 			int idx = (i * output31_conf.w + j) * output31_conf.c + k;
-	// 			cout<<fixed<<setprecision(10)<<output31[idx]<<endl;
+	// for (int i = 0; i < output42_conf.h ; i++) {
+	// 	for (int j = 0; j < output42_conf.w; j++) {
+	// 		for (int k = 0; k < output42_conf.c; k++) {
+	// 			int idx = (i * output42_conf.w + j) * output42_conf.c + k;
+	// 			cout<<fixed<<setprecision(10)<<output42[idx]<<endl;
 	// 		}
 	// 	}
 	// }

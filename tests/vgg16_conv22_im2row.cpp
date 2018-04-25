@@ -40,8 +40,10 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
-	int h_num_tiles = 14;
-	int w_num_tiles = 14;
+	int h_num_tiles = 56;
+	int w_num_tiles = 56;
+
+	bool tiled = true;
 
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 
@@ -177,9 +179,8 @@ int main() {
     cnpy::NpyArray arr22_biases = cnpy::npy_load(weight_dir+"conv2_2_b.npy");
 	conv22_biases = arr22_biases.data<float>();
 
-	int times = 10;
+	int times = 100;
 
-	bool tiled = false;
 
 	auto start = std::chrono::system_clock::now();
 	auto end = std::chrono::system_clock::now();

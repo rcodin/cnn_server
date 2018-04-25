@@ -29,6 +29,11 @@ vgg16_conv22_im2row:
 	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv22_im2row.cpp -o vgg16_conv22_im2row.exec $(INTEL_FLAGS) $(FLAGS)
 vgg16_conv31_im2row:
 	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv31_im2row.cpp -o vgg16_conv31_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv32_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv32_im2row.cpp -o vgg16_conv32_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv33_im2row:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv33_im2row.cpp -o vgg16_conv33_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+
 vgg16_conv41_im2row:
 	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv41_im2row.cpp -o vgg16_conv41_im2row.exec $(INTEL_FLAGS) $(FLAGS)
 vgg16_conv42_im2row:
@@ -53,6 +58,10 @@ vgg16_conv22_im2row_patch:
 	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv22_im2row_patch.cpp -o vgg16_conv22_im2row_patch.exec $(INTEL_FLAGS) $(FLAGS)
 vgg16_conv31_im2row_patch:
 	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv31_im2row_patch.cpp -o vgg16_conv31_im2row_patch.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv32_im2row_patch:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv32_im2row_patch.cpp -o vgg16_conv32_im2row_patch.exec $(INTEL_FLAGS) $(FLAGS)
+vgg16_conv33_im2row_patch:
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv33_im2row_patch.cpp -o vgg16_conv33_im2row_patch.exec $(INTEL_FLAGS) $(FLAGS)
 vgg16_conv41_im2row_patch:
 	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv41_im2row_patch.cpp -o vgg16_conv41_im2row_patch.exec $(INTEL_FLAGS) $(FLAGS)
 vgg16_conv42_im2row_patch:

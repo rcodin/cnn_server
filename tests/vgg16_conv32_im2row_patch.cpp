@@ -40,10 +40,17 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
+	int times = 100;
+	bool tiled = true;
+
 	int h_num_tiles = 28;
 	int w_num_tiles = 28;
 
-	bool tiled = true;
+
+
+
+
+
 
 		Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 
@@ -285,8 +292,6 @@ int main() {
 	    cnpy::NpyArray arr33_biases = cnpy::npy_load(weight_dir+"conv3_3_b.npy");
 		conv33_biases = arr33_biases.data<float>();
 
-	int times = 100;
-
 	double tot_time = 0.0;
 
 	auto start = std::chrono::system_clock::now();
@@ -372,7 +377,44 @@ int main() {
 		pool_forward(input23, output23, input23_conf, output23_conf, pool2_conf);
 		
 
+		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
+				int h_base = h_tile * (input31_tiled_conf.h - (conv31_conf.h - 1));
+				int w_base = w_tile * (input31_tiled_conf.w - (conv31_conf.w - 1));
+
+				TILE_BASE tile_base = {h_base, w_base};
+
+				load_tile(input31, input31_conf, tile_base, h_num_tiles, 
+							input31_tiled, input31_tiled_conf);
+
+				conv_im2row(input31_tiled, output31_tiled, conv31_weights, conv31_biases, conv31_tiled_conf,
+					input31_tiled_conf, output31_tiled_conf);
+
+				save_tile(output31_tiled, output31_tiled_conf, tile_base, output31, output31_conf);
+
+			}
+		}
+
+
+		// for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+		// 	for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
+
+		// 		int h_base = h_tile * (input32_tiled_conf.h - (conv32_conf.h - 1));
+		// 		int w_base = w_tile * (input32_tiled_conf.w - (conv32_conf.w - 1));
+
+		// 		TILE_BASE tile_base = {h_base, w_base};
+
+		// 		load_tile(input32, input32_conf, tile_base, h_num_tiles, 
+		// 					input32_tiled, input32_tiled_conf);
+
+		// 		conv_im2row(input32_tiled, output32_tiled, conv32_weights, conv32_biases, conv32_tiled_conf,
+		// 			input32_tiled_conf, output32_tiled_conf);
+
+		// 		save_tile(output32_tiled, output32_tiled_conf, tile_base, output32, output32_conf);
+
+		// 	}
+		// }
 
 		for (int i = 0; i < times; i++) {
 			start = std::chrono::system_clock::now();
@@ -380,22 +422,21 @@ int main() {
 			for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
 				for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
-					int h_base = h_tile * (input31_tiled_conf.h - (conv31_conf.h - 1));
-					int w_base = w_tile * (input31_tiled_conf.w - (conv31_conf.w - 1));
+					int h_base = h_tile * (input32_tiled_conf.h - (conv32_conf.h - 1));
+					int w_base = w_tile * (input32_tiled_conf.w - (conv32_conf.w - 1));
 
 					TILE_BASE tile_base = {h_base, w_base};
 
-					load_tile(input31, input31_conf, tile_base, h_num_tiles, 
-								input31_tiled, input31_tiled_conf);
+					load_tile(input32, input32_conf, tile_base, h_num_tiles, 
+								input32_tiled, input32_tiled_conf);
 
-					conv_im2row(input31_tiled, output31_tiled, conv31_weights, conv31_biases, conv31_tiled_conf,
-						input31_tiled_conf, output31_tiled_conf);
+					patch_ret(input32_tiled, output32_tiled, conv32_weights, conv32_biases, conv32_tiled_conf,
+						input32_tiled_conf, output32_tiled_conf);
 
-					save_tile(output31_tiled, output31_tiled_conf, tile_base, output31, output31_conf);
+					save_tile(output32_tiled, output32_tiled_conf, tile_base, output32, output32_conf);
 
 				}
 			}
-
 			end = std::chrono::system_clock::now();
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();
@@ -419,15 +460,17 @@ int main() {
 		
 		pool_forward(input23, output23, input23_conf, output23_conf, pool2_conf);
 
+		conv_im2row(input31, output31, conv31_weights,conv31_biases, conv31_conf, input31_conf, output31_conf);
 		
-		
+		// conv_im2row(input32, output32, conv32_weights,conv32_biases, conv32_conf, input32_conf, output32_conf);
+
 		for (int i = 0; i < times; i++) {
 			
-			for (int idx = 0; idx < output31_conf.h * output31_conf.w * output31_conf.c; idx++) {
-				output31[idx] = 0.0f;
-			}
+			// for (int idx = 0; idx < output32_conf.h * output32_conf.w * output32_conf.c; idx++) {
+			// 	output32[idx] = 0.0f;
+			// }
 			start = std::chrono::system_clock::now();
-			conv_im2row(input31, output31, conv31_weights,conv31_biases, conv31_conf, input31_conf, output31_conf);
+			patch_ret(input32, output32, conv32_weights,conv32_biases, conv32_conf, input32_conf, output32_conf);
 			end = std::chrono::system_clock::now();
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();
@@ -442,11 +485,11 @@ int main() {
 
 	// cout<<elapsed_time.count()<<endl;
 
-	// for (int i = 0; i < output31_conf.h ; i++) {
-	// 	for (int j = 0; j < output31_conf.w; j++) {
-	// 		for (int k = 0; k < output31_conf.c; k++) {
-	// 			int idx = (i * output31_conf.w + j) * output31_conf.c + k;
-	// 			cout<<fixed<<setprecision(10)<<output31[idx]<<endl;
+	// for (int i = 0; i < output33_conf.h ; i++) {
+	// 	for (int j = 0; j < output33_conf.w; j++) {
+	// 		for (int k = 0; k < output33_conf.c; k++) {
+	// 			int idx = (i * output33_conf.w + j) * output33_conf.c + k;
+	// 			cout<<fixed<<setprecision(10)<<output33[idx]<<endl;
 	// 		}
 	// 	}
 	// }

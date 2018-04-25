@@ -28,7 +28,7 @@ void im2col_cpu(float* data_im,
 
     int channels_col = channels * ksize * ksize;
 
-    // #pragma omp parallel for
+    #pragma omp parallel for 
     for (int c = 0; c < channels_col; ++c) {
         int w_offset = (c / channels) % ksize;
         int h_offset = c / ksize / channels;

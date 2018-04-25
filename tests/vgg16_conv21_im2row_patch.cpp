@@ -41,11 +41,6 @@ int main() {
 
 	bool tiled = true;
 
-
-	double tot_time = 0.0;
-
-	int times = 100;
-
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 
 	Data_conf input11_tiled_conf = {input11_conf.h/h_num_tiles + (conv11_conf.h - 1),
@@ -154,6 +149,9 @@ int main() {
     cnpy::NpyArray arr21_biases = cnpy::npy_load(weight_dir+"conv2_1_b.npy");
 	conv21_biases = arr21_biases.data<float>();
 
+	int times = 100;
+	double tot_time = 0.0;
+
 	auto start = std::chrono::system_clock::now();
 	auto end = std::chrono::system_clock::now();
 
@@ -197,7 +195,6 @@ int main() {
 		}
 		
 		pool_forward(input13, output13, input13_conf, output13_conf,pool1_conf);
-	
 
 		for (int i = 0; i < times; i++) {
 			start = std::chrono::system_clock::now();
@@ -213,7 +210,7 @@ int main() {
 					load_tile(input21, input21_conf, tile_base, h_num_tiles, 
 								input21_tiled, input21_tiled_conf);
 
-					conv_im2row(input21_tiled, output21_tiled, conv21_weights, conv21_biases, conv21_tiled_conf,
+					patch_ret(input21_tiled, output21_tiled, conv21_weights, conv21_biases, conv21_tiled_conf,
 						input21_tiled_conf, output21_tiled_conf);
 
 					save_tile(output21_tiled, output21_tiled_conf, tile_base, output21, output21_conf);
@@ -224,7 +221,6 @@ int main() {
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();
 		}
-
 	}
 	else {
 		conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
@@ -235,10 +231,11 @@ int main() {
 				input12_conf, output12_conf);
 		
 		pool_forward(input13, output13, input13_conf, output13_conf,pool1_conf);
-
 		for (int i = 0; i < times; i++) {
 			start = std::chrono::system_clock::now();
-			conv_im2row(input21, output21, conv21_weights,conv21_biases, conv21_conf, input21_conf, output21_conf);
+			
+			patch_ret(input21, output21, conv21_weights,conv21_biases, conv21_conf, input21_conf, output21_conf);
+			
 			end = std::chrono::system_clock::now();
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();
@@ -246,6 +243,10 @@ int main() {
 	}
 
 	cout<<tot_time/times<<endl;
+
+	// std::chrono::duration<double> elapsed_time = end-start;
+
+	// cout<<elapsed_time.count()<<endl;
 
 	// for (int i = 0; i < output21_conf.h ; i++) {
 	// 	for (int j = 0; j < output21_conf.w; j++) {

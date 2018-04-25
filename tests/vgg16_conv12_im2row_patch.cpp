@@ -22,16 +22,6 @@ int main() {
 	Data_conf input12_conf = {224, 224, 64};
 	Data_conf output12_conf = {224, 224, 64};
 
-	//Pool1
-	Pool_conf pool1_conf = {2, 2};
-	Data_conf input13_conf = {224, 224, 64};
-	Data_conf output13_conf = {112, 112, 64};
-
-	//Conv21
-	Conv_conf conv21_conf = {3, 3, 1, 1};
-	Data_conf input21_conf = {112, 112, 64};
-	Data_conf output21_conf = {112, 112, 128};
-
 
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
@@ -41,11 +31,7 @@ int main() {
 
 	bool tiled = true;
 
-
-	double tot_time = 0.0;
-
 	int times = 100;
-
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 
 	Data_conf input11_tiled_conf = {input11_conf.h/h_num_tiles + (conv11_conf.h - 1),
@@ -57,12 +43,6 @@ int main() {
 	Data_conf input12_tiled_conf = {input12_conf.h/h_num_tiles + (conv12_conf.h - 1),
 					input12_conf.w/w_num_tiles  + (conv12_conf.w - 1), input12_conf.c};
 	Data_conf output12_tiled_conf = {output12_conf.h/h_num_tiles, output12_conf.w/w_num_tiles, output12_conf.c};
-
-
-	Conv_conf conv21_tiled_conf = {3, 3, 1, 0};
-	Data_conf input21_tiled_conf = {input21_conf.h/h_num_tiles + (conv21_conf.h - 1),
-					input21_conf.w/w_num_tiles  + (conv21_conf.w - 1), input21_conf.c};
-	Data_conf output21_tiled_conf = {output21_conf.h/h_num_tiles, output21_conf.w/w_num_tiles, output21_conf.c};
 
 
 	float *input11 = (float *)mkl_calloc(input11_conf.h * input11_conf.w *
@@ -91,21 +71,6 @@ int main() {
 		output12_tiled_conf.c, bytes, alignment);
 
 
-	float *input13 = output12;
-	float *output13 = (float *)mkl_calloc(output13_conf.h * output13_conf.w *
-		output13_conf.c, bytes, alignment);
-
-	float *input21 = output13;
-
-	float *output21 = (float *)mkl_calloc(output21_conf.h * output21_conf.w *
-		output21_conf.c, bytes, alignment);
-
-	float *input21_tiled = (float *)mkl_calloc(input21_tiled_conf.h * input21_tiled_conf.w *
-		input21_tiled_conf.c, bytes, alignment);
-
-	float *output21_tiled = (float *)mkl_calloc(output21_tiled_conf.h * output21_tiled_conf.w *
-		output21_tiled_conf.c, bytes, alignment);
-
     std::string weight_dir = "/home/roni/project/files/vgg_16/tensorflow/weights_dir/";
     std::string image_file = "/home/roni/project/files/vgg_16/tensorflow/laska.png";
 
@@ -130,9 +95,6 @@ int main() {
 
 	float *conv12_weights;
 	float *conv12_biases;
-
-	float *conv21_weights;
-	float *conv21_biases;
 	
 	cnpy::NpyArray arr11 = cnpy::npy_load(weight_dir+"conv1_1_W.npy");
 	conv11_weights = arr11.data<float>();
@@ -147,13 +109,8 @@ int main() {
     cnpy::NpyArray arr12_biases = cnpy::npy_load(weight_dir+"conv1_2_b.npy");
 	conv12_biases = arr12_biases.data<float>();
 
-
-	cnpy::NpyArray arr21 = cnpy::npy_load(weight_dir+"conv2_1_W.npy");
-	conv21_weights = arr21.data<float>();
-
-    cnpy::NpyArray arr21_biases = cnpy::npy_load(weight_dir+"conv2_1_b.npy");
-	conv21_biases = arr21_biases.data<float>();
-
+	double tot_time = 0.0;
+	
 	auto start = std::chrono::system_clock::now();
 	auto end = std::chrono::system_clock::now();
 
@@ -177,46 +134,24 @@ int main() {
 
 			}
 		}
-		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
-			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
-
-				int h_base = h_tile * (input12_tiled_conf.h - (conv12_conf.h - 1));
-				int w_base = w_tile * (input12_tiled_conf.w - (conv12_conf.w - 1));
-
-				TILE_BASE tile_base = {h_base, w_base};
-
-				load_tile(input12, input12_conf, tile_base, h_num_tiles, 
-							input12_tiled, input12_tiled_conf);
-
-				conv_im2row(input12_tiled, output12_tiled, conv12_weights, conv12_biases, conv12_tiled_conf,
-					input12_tiled_conf, output12_tiled_conf);
-
-				save_tile(output12_tiled, output12_tiled_conf, tile_base, output12, output12_conf);
-
-			}
-		}
-		
-		pool_forward(input13, output13, input13_conf, output13_conf,pool1_conf);
-	
-
 		for (int i = 0; i < times; i++) {
 			start = std::chrono::system_clock::now();
 
 			for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
 				for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
-					int h_base = h_tile * (input21_tiled_conf.h - (conv21_conf.h - 1));
-					int w_base = w_tile * (input21_tiled_conf.w - (conv21_conf.w - 1));
+					int h_base = h_tile * (input12_tiled_conf.h - (conv12_conf.h - 1));
+					int w_base = w_tile * (input12_tiled_conf.w - (conv12_conf.w - 1));
 
 					TILE_BASE tile_base = {h_base, w_base};
 
-					load_tile(input21, input21_conf, tile_base, h_num_tiles, 
-								input21_tiled, input21_tiled_conf);
+					load_tile(input12, input12_conf, tile_base, h_num_tiles, 
+								input12_tiled, input12_tiled_conf);
 
-					conv_im2row(input21_tiled, output21_tiled, conv21_weights, conv21_biases, conv21_tiled_conf,
-						input21_tiled_conf, output21_tiled_conf);
+					patch_ret(input12_tiled, output12_tiled, conv12_weights, conv12_biases, conv12_tiled_conf,
+						input12_tiled_conf, output12_tiled_conf);
 
-					save_tile(output21_tiled, output21_tiled_conf, tile_base, output21, output21_conf);
+					save_tile(output12_tiled, output12_tiled_conf, tile_base, output12, output12_conf);
 
 				}
 			}
@@ -224,21 +159,16 @@ int main() {
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();
 		}
-
 	}
 	else {
 		conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
 				input11_conf, output11_conf);
-		
-		
-		conv_im2row(input12, output12, conv12_weights, conv12_biases, conv12_conf,
-				input12_conf, output12_conf);
-		
-		pool_forward(input13, output13, input13_conf, output13_conf,pool1_conf);
-
+				
 		for (int i = 0; i < times; i++) {
 			start = std::chrono::system_clock::now();
-			conv_im2row(input21, output21, conv21_weights,conv21_biases, conv21_conf, input21_conf, output21_conf);
+
+			patch_ret(input12, output12, conv12_weights, conv12_biases, conv12_conf,
+					input12_conf, output12_conf);
 			end = std::chrono::system_clock::now();
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();
@@ -247,11 +177,11 @@ int main() {
 
 	cout<<tot_time/times<<endl;
 
-	// for (int i = 0; i < output21_conf.h ; i++) {
-	// 	for (int j = 0; j < output21_conf.w; j++) {
-	// 		for (int k = 0; k < output21_conf.c; k++) {
-	// 			int idx = (i * output21_conf.w + j) * output21_conf.c + k;
-	// 			cout<<fixed<<setprecision(10)<<output21[idx]<<endl;
+	// for (int i = 0; i < output12_conf.h; i++) {
+	// 	for (int j = 0; j < output12_conf.h; j++) {
+	// 		for (int k = 0; k < output12_conf.c; k++) {
+	// 			int idx = (i * output12_conf.w + j) * output12_conf.c + k;
+	// 			cout<<fixed<<setprecision(10)<<output12[idx]<<endl;
 	// 		}
 	// 	}
 	// }
