@@ -287,7 +287,7 @@ int main() {
 	    cnpy::NpyArray arr33_biases = cnpy::npy_load(weight_dir+"conv3_3_b.npy");
 		conv33_biases = arr33_biases.data<float>();
 
-	int times = 10;
+	int times = 100;
 
 	double tot_time = 0.0;
 

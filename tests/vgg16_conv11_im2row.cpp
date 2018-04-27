@@ -25,6 +25,8 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
+	bool tiled = true;
+
 	int h_num_tiles = 56;
 	int w_num_tiles = 56;
 
@@ -104,8 +106,6 @@ int main() {
 
     cnpy::NpyArray arr12_biases = cnpy::npy_load(weight_dir+"conv1_2_b.npy");
 	conv12_biases = arr12_biases.data<float>();
-
-	bool tiled = true;
 
 	int times = 100;
 	double tot_time = 0.0;

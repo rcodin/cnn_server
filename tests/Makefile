@@ -43,7 +43,7 @@ vgg16_conv43_im2row:
 	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv43_im2row.cpp -o vgg16_conv43_im2row.exec $(INTEL_FLAGS) $(FLAGS)
 
 vgg16_conv51_im2row:
-	g++ $(INCLUDE_PATH) $(CFLAGS) vgg16_conv51_im2row.cpp -o vgg16_conv51_im2row.exec $(INTEL_FLAGS) $(FLAGS)
+	icpc $(INCLUDE_PATH) $(CFLAGS) vgg16_conv51_im2row.cpp -o vgg16_conv51_im2row.exec $(INTEL_FLAGS) $(FLAGS)
 
 
 

@@ -542,18 +542,18 @@ int main() {
 		// cout<<tot_time/times<<endl;
 	}
 
-	// cout<<tot_time/times<<endl;
+	cout<<tot_time/times<<endl;
 
 	// std::chrono::duration<double> elapsed_time = end-start;
 
 	// cout<<elapsed_time.count()<<endl;
 
-	for (int i = 0; i < output41_conf.h ; i++) {
-		for (int j = 0; j < output41_conf.w; j++) {
-			for (int k = 0; k < output41_conf.c; k++) {
-				int idx = (i * output41_conf.w + j) * output41_conf.c + k;
-				cout<<fixed<<setprecision(10)<<output41[idx]<<endl;
-			}
-		}
-	}
+	// for (int i = 0; i < output41_conf.h ; i++) {
+	// 	for (int j = 0; j < output41_conf.w; j++) {
+	// 		for (int k = 0; k < output41_conf.c; k++) {
+	// 			int idx = (i * output41_conf.w + j) * output41_conf.c + k;
+	// 			cout<<fixed<<setprecision(10)<<output41[idx]<<endl;
+	// 		}
+	// 	}
+	// }
 }
