@@ -40,7 +40,7 @@ int main() {
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
-	bool tiled = true;
+	bool tiled = false;
 
 	int h_num_tiles = 7;
 	int w_num_tiles = 7;

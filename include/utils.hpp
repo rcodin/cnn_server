@@ -8,6 +8,7 @@
 #include <layers.hpp>
 #include <tiling.hpp>
 #include <mkl.h>
+#include <ctime>
 
 //memory manager
 void *alloc_1D(int i, size_t bytes);
@@ -21,7 +22,7 @@ void replicate_across_rows(float *input, float *output, int rows, int cols);
 void replicate_across_cols(float *input, float *output, int rows, int cols);
 unsigned int get_highest_prob(float *data, int data_size);
 void load_tile(float *in, Data_conf input_conf, TILE_BASE tile_idx, int num_tiles,
-						float *out, Data_conf output_conf);
+					Conv_conf conv_cfg, float *out, Data_conf output_conf);
 
 void save_tile(float *in, Data_conf input_conf, TILE_BASE tile_base,
 					float *out, Data_conf output_conf);

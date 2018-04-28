@@ -82,6 +82,7 @@ void print_fc_cfg(int input_cfg, int output_cfg) {
 void free_mem(void *ptr) {
 	free(ptr);
 }
+
 void replicate_across_cols(float *input, float *output, int rows, int cols) {
 	for (int r = 0; r < rows; r++) {
 		int val = input[r];
@@ -117,7 +118,7 @@ unsigned int get_highest_prob(float *data, int data_size) {
 //it load's part of the input in a tile
 
 void load_tile(float *in, Data_conf input_conf, TILE_BASE tile_idx, int num_tiles,
-					float *out, Data_conf output_conf) {
+					Conv_conf conv_cfg, float *out, Data_conf output_conf) {
 
 	int h_base = tile_idx.h;
 	int w_base = tile_idx.w;
@@ -137,6 +138,7 @@ void load_tile(float *in, Data_conf input_conf, TILE_BASE tile_idx, int num_tile
     				out[out_idx] = in[in_idx];
     			else
     				out[out_idx] = 0;
+
     		}
     	}
     }
@@ -195,4 +197,13 @@ void save_tile(float *in, Data_conf input_conf, TILE_BASE tile_base,
 void alloc_patch(float *patch, Data_conf input_conf, int num_tiles, Conv_conf conv_cfg) {
 	patch = (float *)mkl_calloc((input_conf.h/num_tiles) * (input_conf.w/num_tiles) * input_conf.c * 
 						conv_cfg.h * conv_cfg.w, sizeof(float), sizeof(float) *8);
+}
+
+//fill an array with random array
+
+void rand_filler(float *in, int size) {
+	srand(time(0));
+
+	for (int i = 0; i < size; i++)
+		in[i] = rand() % 255;
 }

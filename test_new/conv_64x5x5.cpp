@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <cstdlib>
+#include <stdint.h>
+#include <layers.hpp>
+#include <utils.hpp>
+#include <mkl.h>
+#include <cnpy.hpp>
+#include <input.hpp>
+#include <iomanip>
+#include <fstream>
+#include <tiling.hpp>
+#include <utility>
+
+using namespace std;
+
+int main() {
+	Conv_conf conv11_conf = {5, 5, 1, 2};
+	Data_conf input11_conf = {224, 224, 64};
+	Data_conf output11_conf = {224, 224, 64};
+
+	size_t bytes = sizeof(float);
+	int alignment = bytes * 8;
+
+	bool tiled = true;
+
+	int h_num_tiles = 16;
+	int w_num_tiles = 16;
+
+	Conv_conf conv11_tiled_conf = {5, 5, 1, 0};
+
+	Data_conf input11_tiled_conf = {input11_conf.h/h_num_tiles + (conv11_conf.h - 1),
+						input11_conf.w/w_num_tiles  + (conv11_conf.w - 1), input11_conf.c};
+	Data_conf output11_tiled_conf = {output11_conf.h/h_num_tiles, output11_conf.w/w_num_tiles, output11_conf.c};
+
+
+	float *input11 = (float *)mkl_calloc(input11_conf.h * input11_conf.w *
+		input11_conf.c, bytes, alignment);
+
+	float *output11 = (float *)mkl_calloc(output11_conf.h * output11_conf.w *
+		output11_conf.c, bytes, alignment);
+
+	float *input11_tiled = (float *)mkl_calloc(input11_tiled_conf.h * input11_tiled_conf.w *
+									input11_tiled_conf.c, bytes, alignment);
+
+	float *output11_tiled = (float *)mkl_calloc(output11_tiled_conf.h * output11_tiled_conf.w *
+									output11_tiled_conf.c, bytes, alignment);
+
+	float *conv11_weights = (float *)mkl_calloc(output11_conf.c * conv11_conf.h * conv11_conf.w
+							* input11_conf.c, bytes, alignment);
+
+	float *conv11_biases = (float *)mkl_calloc(output11_conf.c
+							, bytes, alignment);
+
+	
+	// cnpy::NpyArray arr11 = cnpy::npy_load(weight_dir+"conv1_1_W.npy");
+	// conv11_weights = arr11.data<float>();
+
+ //    cnpy::NpyArray arr11_biases = cnpy::npy_load(weight_dir+"conv1_1_b.npy");
+	// conv11_biases = arr11_biases.data<float>();
+
+
+	int times = 10;
+	double tot_time = 0.0;
+
+	auto start = std::chrono::system_clock::now();
+	auto end = std::chrono::system_clock::now();
+
+	if (tiled) {
+		// while (1)
+		for (int i = 0; i < times; i++) {
+			start = std::chrono::system_clock::now();
+
+			for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+				for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
+
+					int h_base = h_tile * (input11_tiled_conf.h - (conv11_conf.h - 1));
+					int w_base = w_tile * (input11_tiled_conf.w - (conv11_conf.w - 1));
+
+					TILE_BASE tile_base = {h_base, w_base};
+
+					load_tile(input11, input11_conf, tile_base, h_num_tiles, 
+								conv11_conf, input11_tiled, input11_tiled_conf);
+
+					conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
+						input11_tiled_conf, output11_tiled_conf);
+
+					save_tile(output11_tiled, output11_tiled_conf, tile_base, output11, output11_conf);
+
+				}
+			}
+			end = std::chrono::system_clock::now();
+			std::chrono::duration<double> elapsed_time = end-start;
+			tot_time += elapsed_time.count();
+		}
+	}
+	else {
+		for (int i = 0; i < times; i++) {
+			start = std::chrono::system_clock::now();
+
+			conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
+				input11_conf, output11_conf);
+			end = std::chrono::system_clock::now();
+			std::chrono::duration<double> elapsed_time = end-start;
+			tot_time += elapsed_time.count();
+		}
+	}
+
+	cout<<tot_time/times<<endl;
+
+	// for (int i = 0; i < output11_conf.h; i++) {
+	// 	for (int j = 0; j < output11_conf.h; j++) {
+	// 		for (int k = 0; k < output11_conf.c; k++) {
+	// 			int idx = (i * output11_conf.w + j) * output11_conf.c + k;
+	// 			cout<<fixed<<setprecision(10)<<output11[idx]<<endl;
+	// 		}
+	// 	}
+	// }
+}
