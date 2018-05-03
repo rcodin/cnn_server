@@ -2,7 +2,7 @@ CFLAGS = -std=c++11
 INCLUDE_PATH = -I../include
 FLAGS = -lcnn -fopenmp -lz
 INTEL_FLAGS = -mkl
-OPENCV_FLAGS = -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs
+# OPENCV_FLAGS = -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs
 
 vgg_16_im2col_opt:
 	icpc -I../include $(CFLAGS) vgg_16_im2col_opt.cpp -o vgg_16_im2col_opt.exec $(INTEL_FLAGS) $(FLAGS)

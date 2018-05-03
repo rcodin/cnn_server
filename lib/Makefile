@@ -5,7 +5,7 @@ OBJS = blas.o layers_forward_pass.o utils.o im2col.o cnpy.o input.o tiling.o
 INCLUDE_DIR := ../include
 CFLAGS = -std=c++11 -fopenmp
 MKL_FLAGS = -mkl 
-OPENCV_FLAGS = -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs
+# OPENCV_FLAGS = -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs
 
 .PHONY: all
 

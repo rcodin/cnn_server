@@ -22,6 +22,7 @@ int main() {
 	Data_conf input12_conf = {224, 224, 64};
 	Data_conf output12_conf = {224, 224, 64};
 
+
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
@@ -75,7 +76,7 @@ int main() {
     Image_cfg input_cfg = {224, 224};
     // float *input = (float *)malloc(input_cfg.rows * input_cfg.cols * 3);
 
-    // int err = read_image_rgb(image_file, input_cfg, input11);
+    int err = read_image_rgb(image_file, input_cfg, input11);
 
     ifstream im_file;
 
@@ -107,59 +108,70 @@ int main() {
     cnpy::NpyArray arr12_biases = cnpy::npy_load(weight_dir+"conv1_2_b.npy");
 	conv12_biases = arr12_biases.data<float>();
 
-	int times = 100;
-	double tot_time = 0.0;
-
 	auto start = std::chrono::system_clock::now();
 	auto end = std::chrono::system_clock::now();
 
 	if (tiled) {
 		// while (1)
-		for (int i = 0; i < times; i++) {
-			start = std::chrono::system_clock::now();
+		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
-			for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
-				for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
+				int h_base = h_tile * (input11_tiled_conf.h - (conv11_conf.h - 1));
+				int w_base = w_tile * (input11_tiled_conf.w - (conv11_conf.w - 1));
 
-					int h_base = h_tile * (input11_tiled_conf.h - (conv11_conf.h - 1));
-					int w_base = w_tile * (input11_tiled_conf.w - (conv11_conf.w - 1));
+				TILE_BASE tile_base = {h_base, w_base};
 
-					TILE_BASE tile_base = {h_base, w_base};
+				load_tile(input11, input11_conf, tile_base, h_num_tiles, 
+							input11_tiled, input11_tiled_conf);
 
-					load_tile(input11, input11_conf, tile_base, h_num_tiles, 
-								conv11_conf, input11_tiled, input11_tiled_conf);
+				conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
+					input11_tiled_conf, output11_tiled_conf);
 
-					conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
-						input11_tiled_conf, output11_tiled_conf);
+				save_tile(output11_tiled, output11_tiled_conf, tile_base, output11, output11_conf);
 
-					save_tile(output11_tiled, output11_tiled_conf, tile_base, output11, output11_conf);
-
-				}
 			}
-			end = std::chrono::system_clock::now();
-			std::chrono::duration<double> elapsed_time = end-start;
-			tot_time += elapsed_time.count();
 		}
+		start = std::chrono::system_clock::now();
+		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
+
+				int h_base = h_tile * (input12_tiled_conf.h - (conv12_conf.h - 1));
+				int w_base = w_tile * (input12_tiled_conf.w - (conv12_conf.w - 1));
+
+				TILE_BASE tile_base = {h_base, w_base};
+
+				load_tile(input12, input12_conf, tile_base, h_num_tiles, 
+							input12_tiled, input12_tiled_conf);
+
+				conv_im2row(input12_tiled, output12_tiled, conv12_weights, conv12_biases, conv12_tiled_conf,
+					input12_tiled_conf, output12_tiled_conf);
+
+				save_tile(output12_tiled, output12_tiled_conf, tile_base, output12, output12_conf);
+
+			}
+		}
+		end = std::chrono::system_clock::now();
 	}
 	else {
-		for (int i = 0; i < times; i++) {
-			start = std::chrono::system_clock::now();
-
-			conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
+		conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
 				input11_conf, output11_conf);
-			end = std::chrono::system_clock::now();
-			std::chrono::duration<double> elapsed_time = end-start;
-			tot_time += elapsed_time.count();
-		}
+		
+		start = std::chrono::system_clock::now();
+		conv_im2row(input12, output12, conv12_weights, conv12_biases, conv12_conf,
+				input12_conf, output12_conf);
+		end = std::chrono::system_clock::now();
 	}
 
-	cout<<tot_time/times<<endl;
 
-	// for (int i = 0; i < output11_conf.h; i++) {
-	// 	for (int j = 0; j < output11_conf.h; j++) {
-	// 		for (int k = 0; k < output11_conf.c; k++) {
-	// 			int idx = (i * output11_conf.w + j) * output11_conf.c + k;
-	// 			cout<<fixed<<setprecision(10)<<output11[idx]<<endl;
+	std::chrono::duration<double> elapsed_time = end-start;
+
+	cout<<elapsed_time.count()<<endl;
+
+	// for (int i = 0; i < output12_conf.h; i++) {
+	// 	for (int j = 0; j < output12_conf.h; j++) {
+	// 		for (int k = 0; k < output12_conf.c; k++) {
+	// 			int idx = (i * output12_conf.w + j) * output12_conf.c + k;
+	// 			cout<<fixed<<setprecision(10)<<output12[idx]<<endl;
 	// 		}
 	// 	}
 	// }

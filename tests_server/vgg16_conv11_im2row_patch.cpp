@@ -22,13 +22,14 @@ int main() {
 	Data_conf input12_conf = {224, 224, 64};
 	Data_conf output12_conf = {224, 224, 64};
 
+
 	size_t bytes = sizeof(float);
 	int alignment = bytes * 8;
 
-	bool tiled = true;
+	int h_num_tiles = 8;
+	int w_num_tiles = 8;
 
-	int h_num_tiles = 56;
-	int w_num_tiles = 56;
+	bool tiled = true;
 
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 
@@ -75,7 +76,7 @@ int main() {
     Image_cfg input_cfg = {224, 224};
     // float *input = (float *)malloc(input_cfg.rows * input_cfg.cols * 3);
 
-    // int err = read_image_rgb(image_file, input_cfg, input11);
+    int err = read_image_rgb(image_file, input_cfg, input11);
 
     ifstream im_file;
 
@@ -107,6 +108,7 @@ int main() {
     cnpy::NpyArray arr12_biases = cnpy::npy_load(weight_dir+"conv1_2_b.npy");
 	conv12_biases = arr12_biases.data<float>();
 
+
 	int times = 100;
 	double tot_time = 0.0;
 
@@ -127,9 +129,9 @@ int main() {
 					TILE_BASE tile_base = {h_base, w_base};
 
 					load_tile(input11, input11_conf, tile_base, h_num_tiles, 
-								conv11_conf, input11_tiled, input11_tiled_conf);
+								input11_tiled, input11_tiled_conf);
 
-					conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
+					patch_ret(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
 						input11_tiled_conf, output11_tiled_conf);
 
 					save_tile(output11_tiled, output11_tiled_conf, tile_base, output11, output11_conf);
@@ -144,9 +146,8 @@ int main() {
 	else {
 		for (int i = 0; i < times; i++) {
 			start = std::chrono::system_clock::now();
-
-			conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
-				input11_conf, output11_conf);
+			patch_ret(input11, output11, conv11_weights, conv11_biases, conv11_conf,
+					input11_conf, output11_conf);
 			end = std::chrono::system_clock::now();
 			std::chrono::duration<double> elapsed_time = end-start;
 			tot_time += elapsed_time.count();

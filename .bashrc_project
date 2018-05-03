@@ -1,12 +1,15 @@
-export PATH=/opt/intel/bin:$PATH
-export LIBRARY_PATH=/home/roni/project/cnn_minimal/lib:$LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/roni/project/cnn_minimal/lib:$LD_LIBRARY_PATH
-export C_INCLUDE_PATH=/opt/intel/mkl/include:$C_INCLUDE_PATH
-export CPLUS_INCLUDE_PATH=/opt/intel/mkl/include:$CPLUS_INCLUDE_PATH
-export C_INCLUDE_PATH=/opt/intel/include:$C_INCLUDE_PATH
-export CPLUS_INCLUDE_PATH=/opt/intel/include:$CPLUS_INCLUDE_PATH
-export PATH=/opt/intel/bin:$PATH
-export LD_LIBRARY_PATH=/opt/intel/mkl/lib/intel64:$LD_LIBRARY_PATH
-export LIBRARY_PATH=/opt/intel/mkl/lib/intel64:$LIBRARY_PATH
-export LD_LIBRARY_PATH=/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler/lib/intel64:$LD_LIBRARY_PATH
-export LIBRARY_PATH=/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler/lib/intel64:$LIBRARY_PATH
+export PROJ_SRC_DIR=/home/ronit/project/cnn_minimal
+export INTEL_DIR=/opt/intel
+
+export PATH=$INTEL_DIR/bin:$PATH
+export LIBRARY_PATH=$PROJ_SRC_DIR/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$PROJ_SRC_DIR/lib:$LD_LIBRARY_PATH
+export C_INCLUDE_PATH=$INTEL_DIR/mkl/include:$C_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH=$INTEL_DIR/mkl/include:$CPLUS_INCLUDE_PATH
+export C_INCLUDE_PATH=$INTEL_DIR/include:$C_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH=$INTEL_DIR/include:$CPLUS_INCLUDE_PATH
+export PATH=$INTEL_DIR/bin:$PATH
+export LD_LIBRARY_PATH=$INTEL_DIR/mkl/lib/intel64:$LD_LIBRARY_PATH
+export LIBRARY_PATH=$INTEL_DIR/mkl/lib/intel64:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$INTEL_DIR/compilers_and_libraries_2018.2.199/linux/compiler/lib/intel64:$LD_LIBRARY_PATH
+export LIBRARY_PATH=$INTEL_DIR/compilers_and_libraries_2018.2.199/linux/compiler/lib/intel64:$LIBRARY_PATH
