@@ -4,15 +4,15 @@
 // #include <opencv2/imgproc/imgproc.hpp>
 // #include <opencv2/opencv.hpp>
 
-// #include <vector>
-// #include <string>
-// #include <input.hpp>
-// #include <iostream>
+#include <vector>
+#include <string>
+#include <input.hpp>
+#include <iostream>
 
 // using namespace cv;
 
-// //read and put the image in data
-// int read_image_rgb(std::string filename, Image_cfg cfg, float *data) {
+//read and put the image in data
+int read_image_rgb(std::string filename, Image_cfg cfg, float *data) {
 // 	Mat img, mat = Mat::zeros(cfg.rows, cfg.cols, CV_8UC3);
 
 //   img = imread(filename, CV_LOAD_IMAGE_COLOR);
@@ -39,5 +39,5 @@
 // 		data[i] = (float)array[i];
 // 	}
 
-// 	return 0;
-// }
+	return 0;
+}

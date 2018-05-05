@@ -1,4 +1,4 @@
-export PROJ_SRC_DIR=/home/ronit/project/cnn_minimal
+export PROJ_SRC_DIR=/home/ronit/project/cnn_server
 export INTEL_DIR=/opt/intel
 
 export PATH=$INTEL_DIR/bin:$PATH

@@ -27,8 +27,8 @@ int main() {
 
 	bool tiled = true;
 
-	int h_num_tiles = 7;
-	int w_num_tiles = 7;
+	int h_num_tiles = 56;
+	int w_num_tiles = 56;
 
 	Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 
@@ -127,7 +127,7 @@ int main() {
 					TILE_BASE tile_base = {h_base, w_base};
 
 					load_tile(input11, input11_conf, tile_base, h_num_tiles, 
-								conv11_conf, input11_tiled, input11_tiled_conf);
+								input11_tiled, input11_tiled_conf);
 
 					conv_im2row(input11_tiled, output11_tiled, conv11_weights, conv11_biases, conv11_tiled_conf,
 						input11_tiled_conf, output11_tiled_conf);

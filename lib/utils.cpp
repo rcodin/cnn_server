@@ -118,7 +118,7 @@ unsigned int get_highest_prob(float *data, int data_size) {
 //it load's part of the input in a tile
 
 void load_tile(float *in, Data_conf input_conf, TILE_BASE tile_idx, int num_tiles,
-					Conv_conf conv_cfg, float *out, Data_conf output_conf) {
+					float *out, Data_conf output_conf) {
 
 	int h_base = tile_idx.h;
 	int w_base = tile_idx.w;

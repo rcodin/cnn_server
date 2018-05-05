@@ -70,8 +70,8 @@ int main() {
 		output12_tiled_conf.c, bytes, alignment);
 
 
-    std::string weight_dir = "/home/roni/project/files/vgg_16/tensorflow/weights_dir/";
-    std::string image_file = "/home/roni/project/files/vgg_16/tensorflow/laska.png";
+    std::string weight_dir = "/home/ronit/project/files/vgg_16/tensorflow/weights_dir/";
+    std::string image_file = "/home/ronit/project/files/vgg_16/tensorflow/laska.png";
 
     Image_cfg input_cfg = {224, 224};
     // float *input = (float *)malloc(input_cfg.rows * input_cfg.cols * 3);
@@ -80,7 +80,7 @@ int main() {
 
     ifstream im_file;
 
-    im_file.open("/home/roni/project/files/vgg_16/tensorflow/image_out.log");
+    im_file.open("/home/ronit/project/files/vgg_16/tensorflow/image_out.log");
 
     for (int i = 0; i < (224 * 224 *3); i++) {
     	im_file>>input11[i];
@@ -111,6 +111,10 @@ int main() {
 	auto start = std::chrono::system_clock::now();
 	auto end = std::chrono::system_clock::now();
 
+
+	int times = 100;
+	double tot_time = 0.0;
+
 	if (tiled) {
 		// while (1)
 		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
@@ -131,41 +135,55 @@ int main() {
 
 			}
 		}
-		start = std::chrono::system_clock::now();
-		for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
-			for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
-				int h_base = h_tile * (input12_tiled_conf.h - (conv12_conf.h - 1));
-				int w_base = w_tile * (input12_tiled_conf.w - (conv12_conf.w - 1));
+		for (int i = 0; i < times; i++) {
+			start = std::chrono::system_clock::now();
 
-				TILE_BASE tile_base = {h_base, w_base};
+			for (int h_tile = 0; h_tile < h_num_tiles; h_tile++) {
+				for (int w_tile = 0; w_tile < w_num_tiles; w_tile++) {
 
-				load_tile(input12, input12_conf, tile_base, h_num_tiles, 
-							input12_tiled, input12_tiled_conf);
+					int h_base = h_tile * (input12_tiled_conf.h - (conv12_conf.h - 1));
+					int w_base = w_tile * (input12_tiled_conf.w - (conv12_conf.w - 1));
 
-				conv_im2row(input12_tiled, output12_tiled, conv12_weights, conv12_biases, conv12_tiled_conf,
-					input12_tiled_conf, output12_tiled_conf);
+					TILE_BASE tile_base = {h_base, w_base};
 
-				save_tile(output12_tiled, output12_tiled_conf, tile_base, output12, output12_conf);
+					load_tile(input12, input12_conf, tile_base, h_num_tiles, 
+								input12_tiled, input12_tiled_conf);
 
+					conv_im2row(input12_tiled, output12_tiled, conv12_weights, conv12_biases, conv12_tiled_conf,
+						input12_tiled_conf, output12_tiled_conf);
+
+					save_tile(output12_tiled, output12_tiled_conf, tile_base, output12, output12_conf);
+
+				}
 			}
+			end = std::chrono::system_clock::now();
+			std::chrono::duration<double> elapsed_time = end-start;
+			tot_time += elapsed_time.count();
 		}
-		end = std::chrono::system_clock::now();
+
 	}
 	else {
+
 		conv_im2row(input11, output11, conv11_weights, conv11_biases, conv11_conf,
 				input11_conf, output11_conf);
 		
-		start = std::chrono::system_clock::now();
-		conv_im2row(input12, output12, conv12_weights, conv12_biases, conv12_conf,
+		for (int i = 0; i < times; i++) {
+			start = std::chrono::system_clock::now();
+
+			conv_im2row(input12, output12, conv12_weights, conv12_biases, conv12_conf,
 				input12_conf, output12_conf);
-		end = std::chrono::system_clock::now();
+			end = std::chrono::system_clock::now();
+			std::chrono::duration<double> elapsed_time = end-start;
+			tot_time += elapsed_time.count();
+		}
 	}
 
+	cout<<tot_time/times<<endl;
 
-	std::chrono::duration<double> elapsed_time = end-start;
+	// std::chrono::duration<double> elapsed_time = end-start;
 
-	cout<<elapsed_time.count()<<endl;
+	// cout<<elapsed_time.count()<<endl;
 
 	// for (int i = 0; i < output12_conf.h; i++) {
 	// 	for (int j = 0; j < output12_conf.h; j++) {

@@ -235,8 +235,8 @@ int main() {
 		float *output41_tiled = (float *)mkl_calloc(output41_tiled_conf.h * output41_tiled_conf.w *
 			output41_tiled_conf.c, bytes, alignment);
 
-	    std::string weight_dir = "/home/roni/project/files/vgg_16/tensorflow/weights_dir/";
-	    std::string image_file = "/home/roni/project/files/vgg_16/tensorflow/laska.png";
+	    std::string weight_dir = "/home/ronit/project/files/vgg_16/tensorflow/weights_dir/";
+	    std::string image_file = "/home/ronit/project/files/vgg_16/tensorflow/laska.png";
 
 	    Image_cfg input_cfg = {224, 224};
 	    // float *input = (float *)malloc(input_cfg.rows * input_cfg.cols * 3);
@@ -245,7 +245,7 @@ int main() {
 
 	    ifstream im_file;
 
-	    im_file.open("/home/roni/project/files/vgg_16/tensorflow/image_out.log");
+	    im_file.open("/home/ronit/project/files/vgg_16/tensorflow/image_out.log");
 
 	    for (int i = 0; i < (224 * 224 *3); i++) {
 	    	im_file>>input11[i];
