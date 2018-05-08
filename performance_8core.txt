@@ -73,7 +73,7 @@ Conv31: 256x3x3
 
 im2row:
 	Normal:
-		0.0146087
+		0.00985581
 	Number of tiles:
 		2x2: 0.00958716
 		4x4: 0.00909091

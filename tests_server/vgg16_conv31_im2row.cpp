@@ -43,7 +43,7 @@ int main() {
 	int h_num_tiles = 28;
 	int w_num_tiles = 28;
 
-	bool tiled = true;
+	bool tiled = false;
 
 		Conv_conf conv11_tiled_conf = {3, 3, 1, 0};
 
